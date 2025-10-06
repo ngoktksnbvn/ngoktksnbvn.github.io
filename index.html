@@ -3,476 +3,424 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ngọ nguội</title>
-    <link rel="icon" href="data:,">
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <title>Matrix Effect</title>
     <style>
-        html, body {
-            height: 100%;
+        * {
             margin: 0;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #000;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        #backgroundVideo {
-            position: fixed;
+        body {
+            background: #000;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+        }
+
+        #canvas {
+            display: block;
+            position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: -1;
         }
 
-        canvas {
+        #textCanvas {
             position: absolute;
-            width: 100%;
-            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            pointer-events: none;
         }
 
-        .box {
+        .play-button {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-        }
-
-        .love-text {
-            position: absolute;
-            top: 44%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #FF69B4;
-            font-size: 40px;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            z-index: 100;
-            text-align: center;
-            font-family: 'Dancing Script', cursive;
-            letter-spacing: 1px;
-        }
-
-        .footer {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-        }
-
-        .play-btn {
-            padding: 10px 20px;
-            background-color: #FF5CA4;
-            color: #fff;
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(45deg, #FF1493, #FF00FF, #9900FF);
             border: none;
-            border-radius: 5px;
+            border-radius: 50%;
             cursor: pointer;
-            font-size: 16px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            box-shadow: 0 0 30px rgba(255, 20, 147, 0.5);
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
         }
 
-        .heart {
-            position: absolute;
-            width: 20px;
-            height: 18px;
+        .play-button:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 0 50px rgba(255, 20, 147, 0.8);
         }
 
-        .heart::before,
-        .heart::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            width: 20px;
-            height: 30px;
-            border-radius: 100px 100px 0 0;
-            background: pink;
+        .play-button.hidden {
+            display: none;
         }
 
-        .heart::before {
-            left: 20px;
-            transform: rotate(-45deg);
-            transform-origin: 0 100%;
-        }
-
-        .heart::after {
-            left: 0;
-            transform: rotate(45deg);
-            transform-origin: 100% 100%;
-        }
-
-        @keyframes beat {
+        @keyframes pulse {
             0%, 100% {
-                transform: scale(1);
+                box-shadow: 0 0 30px rgba(255, 20, 147, 0.5);
             }
             50% {
-                transform: scale(1.2);
+                box-shadow: 0 0 50px rgba(255, 20, 147, 0.8);
             }
-        }
-
-        .nav-arrow {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
-
-        .nav-arrow:hover {
-            transform: scale(1.2);
-        }
-
-        .nav-arrow::after {
-            content: "→";
-            color: #FF69B4;
-            font-size: 40px;
-            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <!-- Video nền -->
-    <!-- <video id="backgroundVideo" autoplay muted loop playsinline>
-        <source src="src/mp3/CÔ GÁI VÀNG - HuyR x Tùng Viu x Quang Đăng - OFFICIAL MUSIC VIDEO.mp4" type="video/mp4">
-        Trình duyệt của bạn không hỗ trợ video.
-    </video> -->
-    <a href="index5.html" class="nav-arrow" id="nextPage"></a>
-    <canvas id="pinkboard"></canvas>
-    <!-- Canvas cho hiệu ứng trái tim -->
-    <canvas id="heartCanvas"></canvas>
-
-    <div class="love-text">Love Trúc xinh</div>
-
-    <!-- Nút phát nhạc -->
-    <button id="playBtn" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 10px 20px; font-size: 16px; cursor: pointer; background: #FF1493; border: none; color: white; border-radius: 5px;">▶</button>
-
-    <!-- Thêm thẻ audio để phát nhạc -->
-    <audio id="backgroundMusic" src="src/mp3/CÔ GÁI VÀNG - HuyR x Tùng Viu x Quang Đăng - OFFICIAL MUSIC VIDEO.mp3" loop playsinline></audio>
+    <canvas id="canvas"></canvas>
+    <canvas id="textCanvas"></canvas>
+    
+    <!-- Nút Play -->
+    <button class="play-button" id="playButton">▶</button>
+    
+    <!-- Nhạc nền -->
+    <audio id="backgroundMusic" loop>
+        <source src="src/mp3/yeunam.mp3" type="audio/mpeg">
+    </audio>
 
     <script>
-        // Xử lý phát nhạc
-        const music = document.getElementById('backgroundMusic');
-        const playBtn = document.getElementById('playBtn');
-        const nextPage = document.getElementById('nextPage');
-        
-        // Thêm sự kiện click cho nút phát
-        playBtn.addEventListener('click', () => {
-            music.play();
-            playBtn.style.display = 'none'; // Ẩn nút sau khi phát
-        });
-
-        // Thêm sự kiện click cho nút chuyển trang
-        nextPage.addEventListener('click', (e) => {
-            e.preventDefault(); // Ngăn chuyển trang ngay lập tức
-            
-            // Lưu trạng thái phát nhạc vào localStorage
-            localStorage.setItem('shouldPlayMusic', 'true');
-            
-            // Chuyển trang
-            window.location.href = 'index5.html';
-        });
-
-        // Hiệu ứng trái tim trên canvas
-        const canvas = document.getElementById('heartCanvas');
+        const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
+
+        // Set canvas size
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        const hearts = [];
-        const numHearts = 100;
+        // Matrix characters - i love you ngoc han và trái tim
+        const matrix = "iloveyoungochan♥♡❤ILOVEYOUNGOCHANiloveu ";
+        const matrixArray = matrix.split('');
 
-        function createHeart() {
-            const heart = {
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                size: Math.random() * 0.5 + 0.5,
-                dx: (Math.random() - 0.5) * 4,
-                dy: (Math.random() - 0.5) * 4,
-                color: `hsla(${Math.random() * 360}, 100%, 70%, 0.8)`
-            };
-            hearts.push(heart);
+        const fontSize = 24;
+        const columns = canvas.width / fontSize;
+
+        // Create array for drops
+        const drops = [];
+        for (let i = 0; i < columns; i++) {
+            drops[i] = Math.floor(Math.random() * canvas.height / fontSize);
         }
 
-        function drawHeart(heart) {
-            ctx.fillStyle = heart.color;
-            ctx.beginPath();
-            ctx.moveTo(heart.x, heart.y);
-            ctx.bezierCurveTo(heart.x + heart.size * 10, heart.y - heart.size * 10, heart.x + heart.size * 20, heart.y + heart.size * 10, heart.x, heart.y + heart.size * 20);
-            ctx.bezierCurveTo(heart.x - heart.size * 20, heart.y + heart.size * 10, heart.x - heart.size * 10, heart.y - heart.size * 10, heart.x, heart.y);
-            ctx.fill();
+        // Create array for colors - NHIỀU MÀU SẮC
+        const matrixColors = [
+            '#FF0080', // Hồng đậm
+            '#FF69B4', // Hồng
+            '#FF1493', // Hồng đậm
+            '#FF00FF', // Magenta
+            '#FF00CC', // Hồng tím
+            '#CC00FF', // Tím
+            '#9900FF', // Tím đậm
+            '#6600FF', // Tím xanh
+            '#0099FF', // Xanh dương
+            '#00CCFF', // Xanh nhạt
+            '#00FFFF', // Cyan
+            '#00FF99', // Xanh lá nhạt
+            '#00FF00', // Xanh lá
+            '#FFFF00', // Vàng
+            '#FFD700', // Vàng kim
+            '#FFA500', // Cam
+            '#FF6600', // Cam đậm
+            '#FF0000', // Đỏ
+            '#FF3366', // Đỏ hồng
+            '#FFFFFF'  // Trắng
+        ];
+
+        function draw() {
+            // Semi-transparent black to create trail effect
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                // Random character
+                const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
+                
+                // Random color from green shades
+                const color = matrixColors[Math.floor(Math.random() * matrixColors.length)];
+                ctx.fillStyle = color;
+
+                // Draw character
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                // Reset drop to top randomly
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+
+                // Move drop down
+                drops[i]++;
+            }
         }
 
-        function updateHearts() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            hearts.forEach((heart) => {
-                heart.x += heart.dx;
-                heart.y += heart.dy;
+        // Animation loop
+        setInterval(draw, 35);
 
-                if (heart.x < 0 || heart.x > canvas.width) heart.dx *= -1;
-                if (heart.y < 0 || heart.y > canvas.height) heart.dy *= -1;
-
-                drawHeart(heart);
-            });
-
-            requestAnimationFrame(updateHearts);
-        }
-
-        for (let i = 0; i < numHearts; i++) {
-            createHeart();
-        }
-
-        updateHearts();
-
-        // Xử lý khi thay đổi kích thước màn hình
+        // Resize canvas on window resize
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+            textCanvas.width = window.innerWidth;
+            textCanvas.height = window.innerHeight;
         });
-         /*
- * Settings
- */
-var settings = {
-    particles: {
-      length:   500, // maximum amount of particles
-      duration:   2, // particle duration in sec
-      velocity: 100, // particle velocity in pixels/sec
-      effect: -0.75, // play with this for a nice effect
-      size:      30, // particle size in pixels
-    },
-  };
-  
-  /*
-   * RequestAnimationFrame polyfill by Erik Möller
-   */
-  (function(){var b=0;var c=["ms","moz","webkit","o"];for(var a=0;a<c.length&&!window.requestAnimationFrame;++a){window.requestAnimationFrame=window[c[a]+"RequestAnimationFrame"];window.cancelAnimationFrame=window[c[a]+"CancelAnimationFrame"]||window[c[a]+"CancelRequestAnimationFrame"]}if(!window.requestAnimationFrame){window.requestAnimationFrame=function(h,e){var d=new Date().getTime();var f=Math.max(0,16-(d-b));var g=window.setTimeout(function(){h(d+f)},f);b=d+f;return g}}if(!window.cancelAnimationFrame){window.cancelAnimationFrame=function(d){clearTimeout(d)}}}());
-  
-  /*
-   * Point class
-   */
-  var Point = (function() {
-    function Point(x, y) {
-      this.x = (typeof x !== 'undefined') ? x : 0;
-      this.y = (typeof y !== 'undefined') ? y : 0;
-    }
-    Point.prototype.clone = function() {
-      return new Point(this.x, this.y);
-    };
-    Point.prototype.length = function(length) {
-      if (typeof length == 'undefined')
-        return Math.sqrt(this.x * this.x + this.y * this.y);
-      this.normalize();
-      this.x *= length;
-      this.y *= length;
-      return this;
-    };
-    Point.prototype.normalize = function() {
-      var length = this.length();
-      this.x /= length;
-      this.y /= length;
-      return this;
-    };
-    return Point;
-  })();
-  
-  /*
-   * Particle class
-   */
-  var Particle = (function() {
-    function Particle() {
-      this.position = new Point();
-      this.velocity = new Point();
-      this.acceleration = new Point();
-      this.age = 0;
-    }
-    Particle.prototype.initialize = function(x, y, dx, dy) {
-      this.position.x = x;
-      this.position.y = y;
-      this.velocity.x = dx;
-      this.velocity.y = dy;
-      this.acceleration.x = dx * settings.particles.effect;
-      this.acceleration.y = dy * settings.particles.effect;
-      this.age = 0;
-    };
-    Particle.prototype.update = function(deltaTime) {
-      this.position.x += this.velocity.x * deltaTime;
-      this.position.y += this.velocity.y * deltaTime;
-      this.velocity.x += this.acceleration.x * deltaTime;
-      this.velocity.y += this.acceleration.y * deltaTime;
-      this.age += deltaTime;
-    };
-    Particle.prototype.draw = function(context, image) {
-      function ease(t) {
-        return (--t) * t * t + 1;
-      }
-      var size = image.width * ease(this.age / settings.particles.duration);
-      context.globalAlpha = 1 - this.age / settings.particles.duration;
-      context.drawImage(image, this.position.x - size / 2, this.position.y - size / 2, size, size);
-    };
-    return Particle;
-  })();
-  
-  /*
-   * ParticlePool class
-   */
-  var ParticlePool = (function() {
-    var particles,
-        firstActive = 0,
-        firstFree   = 0,
-        duration    = settings.particles.duration;
-    
-    function ParticlePool(length) {
-      // create and populate particle pool
-      particles = new Array(length);
-      for (var i = 0; i < particles.length; i++)
-        particles[i] = new Particle();
-    }
-    ParticlePool.prototype.add = function(x, y, dx, dy) {
-      particles[firstFree].initialize(x, y, dx, dy);
-      
-      // handle circular queue
-      firstFree++;
-      if (firstFree   == particles.length) firstFree   = 0;
-      if (firstActive == firstFree       ) firstActive++;
-      if (firstActive == particles.length) firstActive = 0;
-    };
-    ParticlePool.prototype.update = function(deltaTime) {
-      var i;
-      
-      // update active particles
-      if (firstActive < firstFree) {
-        for (i = firstActive; i < firstFree; i++)
-          particles[i].update(deltaTime);
-      }
-      if (firstFree < firstActive) {
-        for (i = firstActive; i < particles.length; i++)
-          particles[i].update(deltaTime);
-        for (i = 0; i < firstFree; i++)
-          particles[i].update(deltaTime);
-      }
-      
-      // remove inactive particles
-      while (particles[firstActive].age >= duration && firstActive != firstFree) {
-        firstActive++;
-        if (firstActive == particles.length) firstActive = 0;
-      }
-      
-      
-    };
-    ParticlePool.prototype.draw = function(context, image) {
-      // draw active particles
-      if (firstActive < firstFree) {
-        for (i = firstActive; i < firstFree; i++)
-          particles[i].draw(context, image);
-      }
-      if (firstFree < firstActive) {
-        for (i = firstActive; i < particles.length; i++)
-          particles[i].draw(context, image);
-        for (i = 0; i < firstFree; i++)
-          particles[i].draw(context, image);
-      }
-    };
-    return ParticlePool;
-  })();
-  
-  /*
-   * Putting it all together
-   */
-  (function(canvas) {
-    var context = canvas.getContext('2d'),
-        particles = new ParticlePool(settings.particles.length),
-        particleRate = settings.particles.length / settings.particles.duration, // particles/sec
-        time;
-    
-    // get point on heart with -PI <= t <= PI
-    function pointOnHeart(t) {
-      return new Point(
-        160 * Math.pow(Math.sin(t), 3),
-        130 * Math.cos(t) - 50 * Math.cos(2 * t) - 20 * Math.cos(3 * t) - 10 * Math.cos(4 * t) + 25
-      );
-    }
-    
-    // creating the particle image using a dummy canvas
-    var image = (function() {
-      var canvas  = document.createElement('canvas'),
-          context = canvas.getContext('2d');
-      canvas.width  = settings.particles.size;
-      canvas.height = settings.particles.size;
-      // helper function to create the path
-      function to(t) {
-        var point = pointOnHeart(t);
-        point.x = settings.particles.size / 2 + point.x * settings.particles.size / 350;
-        point.y = settings.particles.size / 2 - point.y * settings.particles.size / 350;
-        return point;
-      }
-      // create the path
-      context.beginPath();
-      var t = -Math.PI;
-      var point = to(t);
-      context.moveTo(point.x, point.y);
-      while (t < Math.PI) {
-        t += 0.01; // baby steps!
-        point = to(t);
-        context.lineTo(point.x, point.y);
-      }
-      context.closePath();
-      // create the fill
-      context.fillStyle = '#ea80b0';
-      context.fill();
-      // create the image
-      var image = new Image();
-      image.src = canvas.toDataURL();
-      return image;
-    })();
-    
-    // render that thing!
-    function render() {
-      // next animation frame
-      requestAnimationFrame(render);
-      
-      // update time
-      var newTime   = new Date().getTime() / 1000,
-          deltaTime = newTime - (time || newTime);
-      time = newTime;
-      
-      // clear canvas
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // create new particles
-      var amount = particleRate * deltaTime;
-      for (var i = 0; i < amount; i++) {
-        var pos = pointOnHeart(Math.PI - 2 * Math.PI * Math.random());
-        var dir = pos.clone().length(settings.particles.velocity);
-        particles.add(canvas.width / 2 + pos.x, canvas.height / 2 - pos.y, dir.x, -dir.y);
-      }
-      
-      // update and draw particles
-      particles.update(deltaTime);
-      particles.draw(context, image);
-    }
-    
-    // handle (re-)sizing of the canvas
-    function onResize() {
-      canvas.width  = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
-    }
-    window.onresize = onResize;
-    
-    // delay rendering bootstrap
-    setTimeout(function() {
-      onResize();
-      render();
-    }, 10);
-  })(document.getElementById('pinkboard'));
-  
 
-  
+        // ============ PARTICLE TEXT ANIMATION ============
+        const textCanvas = document.getElementById('textCanvas');
+        const textCtx = textCanvas.getContext('2d');
+        textCanvas.width = window.innerWidth;
+        textCanvas.height = window.innerHeight;
+
+        const words = ['Chúc', 'Cậu', 'buổi', 'Sáng', 'Vui', 'Vẻ', 'Nha'];
+        let currentWordIndex = 0;
+        let particles = [];
+        let isCountingDown = true;
+        let countdownIndex = 0;
+        let hasStarted = false;
+        const countdownNumbers = ['3', '2', '1'];
+
+        // Particle class
+        class Particle {
+            constructor(x, y, targetX, targetY, color) {
+                this.x = x;
+                this.y = y;
+                this.targetX = targetX;
+                this.targetY = targetY;
+                this.color = color;
+                this.size = 1.5;
+                // Tăng tốc độ và random hướng bay để particles tan khắp màn hình
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 30 + 20;
+                this.speedX = Math.cos(angle) * speed;
+                this.speedY = Math.sin(angle) * speed;
+                this.friction = 0.92;
+                this.ease = 0.12; // Tăng tốc độ gộp lại nhanh hơn
+                this.isExploding = false;
+            }
+
+            update() {
+                if (this.isExploding) {
+                    this.speedX *= this.friction;
+                    this.speedY *= this.friction;
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                } else {
+                    let dx = this.targetX - this.x;
+                    let dy = this.targetY - this.y;
+                    this.x += dx * this.ease;
+                    this.y += dy * this.ease;
+                }
+            }
+
+            draw() {
+                textCtx.fillStyle = this.color;
+                textCtx.shadowBlur = 20;
+                textCtx.shadowColor = this.color;
+                textCtx.beginPath();
+                textCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                textCtx.fill();
+            }
+
+            explode() {
+                this.isExploding = true;
+            }
+
+            setTarget(x, y) {
+                this.targetX = x;
+                this.targetY = y;
+                this.isExploding = false;
+            }
+        }
+
+        // Lấy pixels từ text
+        function getTextPixels(text) {
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            const fontSize = 120;
+            tempCtx.font = `bold ${fontSize}px Arial`;
+            
+            const metrics = tempCtx.measureText(text);
+            tempCanvas.width = metrics.width + 50;
+            tempCanvas.height = fontSize + 50;
+            
+            tempCtx.font = `bold ${fontSize}px Arial`;
+            tempCtx.fillStyle = 'white';
+            tempCtx.textBaseline = 'middle';
+            tempCtx.fillText(text, 25, fontSize / 2 + 25);
+            
+            const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+            const pixels = [];
+            const gap = 2; // Khoảng cách giữa các particles - giảm để có nhiều hạt hơn
+            
+            for (let y = 0; y < imageData.height; y += gap) {
+                for (let x = 0; x < imageData.width; x += gap) {
+                    const index = (y * imageData.width + x) * 4;
+                    const alpha = imageData.data[index + 3];
+                    
+                    if (alpha > 128) {
+                        const centerX = window.innerWidth / 2;
+                        const centerY = window.innerHeight / 2;
+                        const offsetX = tempCanvas.width / 2;
+                        const offsetY = tempCanvas.height / 2;
+                        
+                        pixels.push({
+                            x: centerX + x - offsetX,
+                            y: centerY + y - offsetY
+                        });
+                    }
+                }
+            }
+            
+            return pixels;
+        }
+
+        // Random colors for particles
+        const particleColors = [
+            '#FF1493', '#FF00FF', '#9900FF', '#6600FF',
+            '#0099FF', '#00FFFF', '#00FF00', '#FFFF00',
+            '#FFD700', '#FFA500', '#FF0000', '#FF69B4'
+        ];
+
+        // Tạo particles cho chữ đầu tiên
+        function createParticles(text) {
+            const pixels = getTextPixels(text);
+            const newParticles = [];
+            
+            // Chọn 1 màu duy nhất cho tất cả particles của chữ này
+            const color = particleColors[Math.floor(Math.random() * particleColors.length)];
+            
+            pixels.forEach((pixel, i) => {
+                const startX = window.innerWidth / 2;
+                const startY = window.innerHeight / 2;
+                
+                newParticles.push(new Particle(startX, startY, pixel.x, pixel.y, color));
+            });
+            
+            return newParticles;
+        }
+
+        // Biến đếm số lần đã hiển thị hết tất cả chữ
+        let loopCount = 0;
+
+        // Chuyển sang chữ mới
+        function changeWord() {
+            // Đợi 1s để người xem đọc chữ trước khi vỡ
+            setTimeout(() => {
+                currentWordIndex = (currentWordIndex + 1) % words.length;
+                
+                // Kiểm tra nếu đã hiển thị hết tất cả chữ
+                if (currentWordIndex === 0) {
+                    loopCount++;
+                    // Chuyển sang index2.html sau khi hiển thị hết 1 lần
+                    if (loopCount === 1) {
+                        setTimeout(() => {
+                            // Lưu thời gian nhạc hiện tại (36 giây)
+                            localStorage.setItem('musicTime', '34');
+                            window.location.href = 'index2.html';
+                        }, 1000); // Đợi 1s rồi chuyển trang
+                        return;
+                    }
+                }
+                
+                const newText = words[currentWordIndex];
+                const pixels = getTextPixels(newText);
+                
+                // Làm particles vỡ ra
+                particles.forEach(p => p.explode());
+                
+                setTimeout(() => {
+                // Chọn 1 màu duy nhất cho chữ mới
+                const newColor = particleColors[Math.floor(Math.random() * particleColors.length)];
+                
+                // Tạo particles mới nếu cần
+                if (pixels.length > particles.length) {
+                    for (let i = particles.length; i < pixels.length; i++) {
+                        particles.push(new Particle(
+                            window.innerWidth / 2,
+                            window.innerHeight / 2,
+                            pixels[i].x,
+                            pixels[i].y,
+                            newColor
+                        ));
+                    }
+                }
+                
+                // Cập nhật target cho các particles
+                particles.forEach((p, i) => {
+                    if (i < pixels.length) {
+                        p.setTarget(pixels[i].x, pixels[i].y);
+                        p.color = newColor; // Tất cả particles cùng màu
+                    }
+                });
+                
+                // Xóa particles thừa
+                if (particles.length > pixels.length) {
+                    particles = particles.slice(0, pixels.length);
+                }
+                }, 700); // Delay 0.7s trước khi gộp lại
+            }, 1000); // Giữ chữ 1s trước khi vỡ
+        }
+
+        // Hàm hiển thị đếm ngược
+        function showCountdown() {
+            if (countdownIndex < countdownNumbers.length) {
+                particles = createParticles(countdownNumbers[countdownIndex]);
+                countdownIndex++;
+                
+                setTimeout(() => {
+                    particles.forEach(p => p.explode());
+                    setTimeout(() => {
+                        showCountdown();
+                    }, 500);
+                }, 800); // Giữ mỗi số 0.8s
+            } else {
+                // Kết thúc đếm ngược, bắt đầu hiển thị chữ
+                isCountingDown = false;
+                currentWordIndex = 0;
+                particles = createParticles(words[0]);
+                setTimeout(() => {
+                    setInterval(changeWord, 4000);
+                }, 1000); // Hiển thị chữ đầu tiên 1s rồi mới bắt đầu loop
+            }
+        }
+
+        // Animation loop cho particles
+        function animateParticles() {
+            textCtx.clearRect(0, 0, textCanvas.width, textCanvas.height);
+            
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            
+            requestAnimationFrame(animateParticles);
+        }
+
+        animateParticles();
+
+        // Xử lý nút Play
+        const playButton = document.getElementById('playButton');
+        const audio = document.getElementById('backgroundMusic');
+        audio.volume = 0.5; // Âm lượng 50%
+
+        playButton.addEventListener('click', () => {
+            // Ẩn nút play
+            playButton.classList.add('hidden');
+            
+            // Phát nhạc
+            audio.play().catch(e => {
+                console.log('Không thể phát nhạc:', e);
+            });
+            
+            // Bắt đầu đếm ngược
+            hasStarted = true;
+            showCountdown();
+        });
     </script>
 </body>
 </html>
+
