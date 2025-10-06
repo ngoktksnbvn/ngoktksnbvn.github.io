@@ -193,13 +193,41 @@
             // Kiểm tra xem có thời gian nhạc được lưu không
             const savedTime = localStorage.getItem('musicTime');
             if (savedTime) {
-                music.currentTime = parseFloat(savedTime); // Bắt đầu từ giây thứ 36
+                music.currentTime = parseFloat(savedTime); // Bắt đầu từ giây thứ 34
                 localStorage.removeItem('musicTime'); // Xóa sau khi sử dụng
             }
             
-            music.play().catch(e => {
-                console.log('Không thể phát nhạc:', e);
-            });
+            // Thử phát nhạc
+            const playPromise = music.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(e => {
+                    console.log('Không thể phát nhạc tự động:', e);
+                    // Trên mobile, cần user interaction để phát nhạc
+                });
+            }
+        });
+
+        // Xử lý phát nhạc khi user tương tác (cho mobile)
+        let musicStarted = false;
+        document.addEventListener('click', (e) => {
+            if (!musicStarted) {
+                music.play().then(() => {
+                    musicStarted = true;
+                }).catch(e => {
+                    console.log('Không thể phát nhạc:', e);
+                });
+            }
+        });
+
+        // Xử lý touch cho mobile
+        document.addEventListener('touchstart', () => {
+            if (!musicStarted) {
+                music.play().then(() => {
+                    musicStarted = true;
+                }).catch(e => {
+                    console.log('Không thể phát nhạc:', e);
+                });
+            }
         });
 
         // Hiệu ứng trái tim trên canvas
@@ -273,6 +301,19 @@
 
         // Xử lý click vào bất cứ đâu trên màn hình
         document.addEventListener('click', (e) => {
+            // Chọn ảnh ngẫu nhiên từ 1.jpg đến 9.jpg
+            const randomImage = Math.floor(Math.random() * 9) + 1;
+            displayImage.src = `src/img/${randomImage}.jpg`;
+            imageOverlay.style.display = 'flex';
+            
+            // Tự động đóng sau 3 giây
+            setTimeout(() => {
+                imageOverlay.style.display = 'none';
+            }, 3000);
+        });
+
+        // Xử lý touch cho mobile
+        document.addEventListener('touchstart', (e) => {
             // Chọn ảnh ngẫu nhiên từ 1.jpg đến 9.jpg
             const randomImage = Math.floor(Math.random() * 9) + 1;
             displayImage.src = `src/img/${randomImage}.jpg`;
