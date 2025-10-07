@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matrix Effect</title>
+    <title>Ngọc Hân</title>
     <style>
         * {
             margin: 0;
@@ -39,8 +39,8 @@
             transform: translate(-50%, -50%);
             width: 120px;
             height: 120px;
-            background: linear-gradient(45deg, #FF1493, #FF00FF, #9900FF);
-            border: none;
+            background: transparent;
+            border: 3px solid #FF1493;
             border-radius: 50%;
             cursor: pointer;
             z-index: 20;
@@ -48,8 +48,8 @@
             align-items: center;
             justify-content: center;
             font-size: 40px;
-            color: white;
-            box-shadow: 0 0 30px rgba(255, 20, 147, 0.5);
+            color: #FF1493;
+            box-shadow: 0 0 30px rgba(255, 20, 147, 0.3);
             transition: all 0.3s ease;
             animation: pulse 2s infinite;
         }
@@ -93,8 +93,8 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        // Matrix characters - i love you ngoc han và trái tim
-        const matrix = "iloveyoungochan♥♡❤ILOVEYOUNGOCHANiloveu ";
+        // Matrix characters - i love you ngoc han, trái tim, tiếng Nhật và ký tự hacker
+        const matrix = "iloveyoungochan♥♡❤ILOVEYOUNGOCHANiloveuあいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+-=[]{}|;:,.<>?/~`あかさたなはまやらわいきしちにひみりうくすつぬふむゆるえけせてねへめれおこそとのほもよろを";
         const matrixArray = matrix.split('');
 
         const fontSize = 24;
